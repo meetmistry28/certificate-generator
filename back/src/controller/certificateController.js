@@ -6,41 +6,8 @@ const fs = require("fs");
 exports.createCertificate = async (req, res) => {
     try {
         console.log("Received request body:", req.body);
-        const { customerName, siteLocation, makeModel, range, serialNo, calibrationGas, gasCanisterDetails, dateOfCalibration, calibrationDueDate } = req.body;
-
-        // Validate required fields
-        if (!customerName ||
-            !siteLocation ||
-            !makeModel ||
-            !range ||
-            !serialNo ||
-            !calibrationGas ||
-            !gasCanisterDetails ||
-            !dateOfCalibration ||
-            !calibrationDueDate
-        ) {
-            console.error("Missing required fields");
-            return res.status(400).json({ error: "All fields are required" });
-        }
-
-        const newCertificate = new Certificate({
-            customerName,
-            siteLocation,
-            makeModel,
-            range,
-            serialNo,
-            calibrationGas,
-            gasCanisterDetails,
-            dateOfCalibration: new Date(dateOfCalibration),
-            calibrationDueDate: new Date(calibrationDueDate)
-        });
-
-        console.log("Saving certificate to database...");
-        await newCertificate.save();
-        console.log("Certificate saved successfully");
-
-        console.log("Generating PDF...");
-        const pdfPath = await generatePDF(
+        const {
+            certificateNo,
             customerName,
             siteLocation,
             makeModel,
@@ -50,7 +17,49 @@ exports.createCertificate = async (req, res) => {
             gasCanisterDetails,
             dateOfCalibration,
             calibrationDueDate,
-            newCertificate.certificateId
+            observations // Now capturing observations
+        } = req.body;
+
+        // Validate required fields
+        if (!certificateNo || !customerName || !siteLocation || !makeModel || !range || !serialNo || 
+            !calibrationGas || !gasCanisterDetails || !dateOfCalibration || 
+            !calibrationDueDate || !observations || observations.length === 0) {
+            console.error("Missing required fields");
+            return res.status(400).json({ error: "All fields and at least one observation are required" });
+        }
+
+        const newCertificate = new Certificate({
+            certificateNo,
+            customerName,
+            siteLocation,
+            makeModel,
+            range,
+            serialNo,
+            calibrationGas,
+            gasCanisterDetails,
+            dateOfCalibration: new Date(dateOfCalibration),
+            calibrationDueDate: new Date(calibrationDueDate),
+            observations // Storing the observations in the database
+        });
+
+        console.log("Saving certificate to database...");
+        await newCertificate.save();
+        console.log("Certificate saved successfully");
+
+        console.log("Generating PDF...");
+        const pdfPath = await generatePDF(
+            certificateNo,
+            customerName,
+            siteLocation,
+            makeModel,
+            range,
+            serialNo,
+            calibrationGas,
+            gasCanisterDetails,
+            dateOfCalibration,
+            calibrationDueDate,
+            newCertificate.certificateId,
+            observations // Now passing observations to the PDF generator
         );
         console.log("PDF generated successfully at:", pdfPath);
 

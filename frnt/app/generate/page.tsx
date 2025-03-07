@@ -3,7 +3,14 @@
 import { useState } from "react";
 import axios from "axios";
 
+interface Observation {
+  gas: string;
+  before: string;
+  after: string;
+}
+
 interface CertificateRequest {
+  certificateNo: String,
   customerName: String,
   siteLocation: String,
   makeModel: String,
@@ -12,7 +19,8 @@ interface CertificateRequest {
   calibrationGas: String,
   gasCanisterDetails: String,
   dateOfCalibration: Date,
-  calibrationDueDate: Date
+  calibrationDueDate: Date,
+  observations: Observation[]
 }
 
 interface CertificateResponse {
@@ -22,17 +30,78 @@ interface CertificateResponse {
 }
 
 export default function GenerateCertificate() {
-  const [formData, setFormData] = useState<CertificateRequest>({ customerName: "", siteLocation: "", makeModel: "", range: "", serialNo: "", calibrationGas: "", gasCanisterDetails: "", dateOfCalibration: new Date(), calibrationDueDate: new Date() });
+  const [formData, setFormData] = useState<CertificateRequest>({
+    certificateNo: "",
+    customerName: "",
+    siteLocation: "",
+    makeModel: "",
+    range: "",
+    serialNo: "",
+    calibrationGas: "",
+    gasCanisterDetails: "",
+    dateOfCalibration: new Date().toISOString().split('T')[0],
+    calibrationDueDate: new Date().toISOString().split('T')[0],
+    observations: [{ gas: "", before: "", after: "" }]
+  });
   const [certificate, setCertificate] = useState<CertificateResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.type === 'date'
-      ? new Date(e.target.value).toISOString().split('T')[0]
-      : e.target.value;
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
+    const { name, value } = e.target;
 
-    setFormData({ ...formData, [e.target.name]: value });
+    const updatedValue = e.target.type === "date"
+      ? new Date(e.target.value).toISOString().split("T")[0]
+      : value;
+
+    let updatedObservations = formData.observations;
+
+    if (name === "makeModel") {
+      switch (value) {
+        case "GT":
+          updatedObservations = Array(4).fill({ gas: "", before: "", after: "" });
+          break;
+        case "PS200M1":
+          updatedObservations = Array(2).fill({ gas: "", before: "", after: "" });
+          break;
+        case "PS200M2":
+          updatedObservations = Array(3).fill({ gas: "", before: "", after: "" });
+          break;
+        case "PS200M3":
+          updatedObservations = Array(4).fill({ gas: "", before: "", after: "" });
+          break;
+        case "IR700":
+          updatedObservations = Array(1).fill({ gas: "", before: "", after: "" });
+          break;
+        case "Leak":
+          updatedObservations = Array(3).fill({ gas: "", before: "", after: "" });
+          break;
+        case "GS700":
+          updatedObservations = Array(5).fill({ gas: "", before: "", after: "" });
+          break;
+        default:
+          updatedObservations = [{ gas: "", before: "", after: "" }];
+      }
+    }
+
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: updatedValue,
+      observations: updatedObservations,
+    }));
+  };
+
+  const handleObservationChange = (index: number, field: keyof Observation, value: string) => {
+    const updatedObservations = [...formData.observations];
+    updatedObservations[index] = { ...updatedObservations[index], [field]: value };
+    setFormData({ ...formData, observations: updatedObservations });
+  };
+
+  const addObservation = () => {
+    setFormData({
+      ...formData,
+      observations: [...formData.observations, { gas: "", before: "", after: "" }]
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -81,6 +150,15 @@ export default function GenerateCertificate() {
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           type="text"
+          name="certificateNo"
+          placeholder="Enter Certificate No"
+          value={formData.certificateNo}
+          onChange={handleChange}
+          className="p-2 border rounded"
+
+        />
+        <input
+          type="text"
           name="customerName"
           placeholder="Enter Name"
           value={formData.customerName}
@@ -97,15 +175,22 @@ export default function GenerateCertificate() {
           className="p-2 border rounded"
 
         />
-        <input
-          type="text"
+        <select
           name="makeModel"
-          placeholder="Enter Make and Model"
           value={formData.makeModel}
           onChange={handleChange}
           className="p-2 border rounded"
+        >
+          <option value="">Select Make and Model</option>
+          <option value="GT">GT</option>
+          <option value="PS200M1">PS200M1</option>
+          <option value="PS200M2">PS200M2</option>
+          <option value="PS200M3">PS200M3</option>
+          <option value="IR700">IR700</option>
+          <option value="Leak">Leak Severe</option>
+          <option value="GS700">GS700</option>
+        </select>
 
-        />
         <input
           type="text"
           name="range"
@@ -161,8 +246,61 @@ export default function GenerateCertificate() {
 
         />
 
-        <button type="submit" className="bg-blue-500 text-white p-2 rounded-md" disabled={loading}>
-          {loading ? "Generating..." : "Generate"}
+        <h2 className="text-lg font-bold mt-4">Observation Table</h2>
+        <table className="table-auto border-collapse border border-gray-500 w-full">
+          <thead>
+            <tr>
+              <th className="border p-2">Gas</th>
+              <th className="border p-2">Before Calibration</th>
+              <th className="border p-2">After Calibration</th>
+            </tr>
+          </thead>
+          <tbody>
+            {formData.observations.map((obs, index) => (
+              <tr key={index}>
+                <td className="border p-2">
+                  <input
+                    type="text"
+                    value={obs.gas}
+                    onChange={(e) => handleObservationChange(index, "gas", e.target.value)}
+                    className="w-full p-1"
+                  />
+                </td>
+                <td className="border p-2">
+                  <input
+                    type="text"
+                    value={obs.before}
+                    onChange={(e) => handleObservationChange(index, "before", e.target.value)}
+                    className="w-full p-1"
+                  />
+                </td>
+                <td className="border p-2">
+                  <input
+                    type="text"
+                    value={obs.after}
+                    onChange={(e) => handleObservationChange(index, "after", e.target.value)}
+                    className="w-full p-1"
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <button
+          type="button"
+          onClick={addObservation}
+          className="bg-gray-500 text-white p-2 rounded-md"
+        >
+          Add Observation
+        </button>
+
+        <button
+          type="submit"
+          className="bg-blue-500 text-white p-2 rounded-md"
+          disabled={loading}
+        >
+          {loading ? "Generating..." : "Generate Certificate"}
         </button>
       </form>
 

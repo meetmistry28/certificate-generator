@@ -1,5 +1,11 @@
 const mongoose = require("mongoose");
 
+const observationSchema = new mongoose.Schema({
+    gas: { type: String, required: true },
+    before: { type: String, required: true },
+    after: { type: String, required: true }
+}, { _id: false });
+
 const certificateSchema = new mongoose.Schema({
     certificateId: { 
         type: String, 
@@ -7,6 +13,7 @@ const certificateSchema = new mongoose.Schema({
         default: () => `CERT-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         index: true
     },
+    certificateNo: { type: String, required: true },
     customerName: { type: String, required: true },
     siteLocation: { type: String, required: true },
     makeModel: { type: String, required: true },
@@ -15,7 +22,8 @@ const certificateSchema = new mongoose.Schema({
     calibrationGas: { type: String, required: true },
     gasCanisterDetails: { type: String, required: true },
     dateOfCalibration: { type: Date, required: true },
-    calibrationDueDate: { type: Date, required: true }
+    calibrationDueDate: { type: Date, required: true },
+    observations: { type: [observationSchema], required: true } // Now storing multiple observations
 }, {
     timestamps: true
 });
