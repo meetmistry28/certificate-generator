@@ -14,7 +14,8 @@ const generatePDF = async (
     dateOfCalibration,
     calibrationDueDate,
     certificateId,
-    observations
+    observations,
+    engineerName
 ) => {
     const doc = new PDFDocument({
         layout: 'portrait',
@@ -31,7 +32,7 @@ const generatePDF = async (
     doc.pipe(fs.createWriteStream(fileName));
 
     // Background color
-    doc.rect(0, 0, doc.page.width, doc.page.height).fill('#f5f5f5');
+    doc.rect(0, 0, doc.page.width, doc.page.height).fill('#fff');
 
     const pageHeight = doc.page.height; // Get total page height
     const footerY = pageHeight - 120; // Position above the "Authorized Signatory"
@@ -41,7 +42,7 @@ const generatePDF = async (
     const margin = 50;
     doc.rect(margin, margin, doc.page.width - 2 * margin, doc.page.height - 2 * margin)
         .lineWidth(2)
-        .stroke('#1a237e');
+        .stroke('#000');
 
     // Logo
     const logoPath = path.join(process.cwd(), 'src', 'assets', 'thumbnail.png');
@@ -49,11 +50,6 @@ const generatePDF = async (
         doc.image(logoPath, margin + 10, margin + 10, { width: 160, height: 80 });
     }
 
-    // Company Name
-    // doc.font('Helvetica-Bold')
-    //     .fontSize(18)
-    //     .fillColor('#1a237e')
-    //     .text('SPRIER TECHNOLOGY CONSULTANCY', 50, 50, { align: 'center' });
 
     // Certificate Title
 
@@ -63,7 +59,9 @@ const generatePDF = async (
     const lineHeight = 20;  // Space between lines
     let y = startY; // Initialize Y position
 
-    const addRow = (label, value) => {
+    const addRow = (label, value, extraSpace = false) => {
+        if (extraSpace) y += 0;  // Add extra space before
+        
         doc.font('Helvetica-Bold')
             .fontSize(12)
             .fillColor('#000')
@@ -73,11 +71,27 @@ const generatePDF = async (
             .text(value, column2X, y);
 
         y += lineHeight;  // Move Y position down
+        if (extraSpace) y += 20;  // Add extra space after
+    };
+
+    const addRow1 = (label, value, extraSpace = false) => {
+        if (extraSpace) y += 0;  // Add extra space before
+        
+        doc.font('Helvetica-Bold')
+            .fontSize(12)
+            .fillColor('#000')
+            .text(label, column1X, y);
+
+        doc.font('Helvetica')
+            .text(value, column2X, y);
+
+        y += lineHeight;  // Move Y position down
+        if (extraSpace) y += 40;  // Add extra space after
     };
 
     doc.moveDown(3);
     doc.y = 150;
-    doc.fontSize(22)
+    doc.fontSize(16)
         .fillColor('#1a237e')
         .text('CALIBRATION CERTIFICATE', { align: 'center', underline: true })
         .moveDown(2);
@@ -88,16 +102,16 @@ const generatePDF = async (
     addRow('Customer Name', ":" + " " + customerName);
     addRow('Site Location', ":" + " " + siteLocation);
     addRow('Make & Model', ":" + " " + makeModel);
-    addRow('Range', ":" + " " + range);
+    addRow('Range', ":" + " " + range, true);
     addRow('Serial No.', ":" + " " + serialNo);
     addRow('Calibration Gas', ":" + " " + calibrationGas);
-    addRow('Gas Canister Details', ":" + " " + gasCanisterDetails);
+    addRow1('Gas Canister Details', ":" + " " + gasCanisterDetails, true);
     addRow('Date of Calibration', ":" + " " + new Date(dateOfCalibration).toLocaleDateString());
     addRow('Calibration Due Date', ":" + " " + new Date(calibrationDueDate).toLocaleDateString());
 
     doc.y = 450;
     doc.fontSize(10)
-        .fillColor('#1a237e')
+        .fillColor('#000')
         .text('OBSERVATIONS', { align: 'left', underline: true })
         .moveDown(2);
 
@@ -107,13 +121,22 @@ const generatePDF = async (
     const colWidths = [40, 150, 150, 140]; // Adjusted column widths
     const rowHeight = 20;
 
+    // Draw header borders
+    doc.fillColor('#000')
+        .rect(tableLeft, tableTop, colWidths[0], rowHeight).stroke() // Sr. No.
+        .rect(tableLeft + colWidths[0], tableTop, colWidths[1], rowHeight).stroke() // Concentration of Gas,\
+        .rect(tableLeft + colWidths[0] + colWidths[1], tableTop, colWidths[2], rowHeight).stroke() // Reading Before Calibration
+        .rect(tableLeft + colWidths[0] + colWidths[1] + colWidths[2], tableTop, colWidths[3], rowHeight).stroke() // Reading After Calibration
+
+
+
     doc.font('Helvetica-Bold')
         .fontSize(10)
         .fillColor('#000')
         .text('Sr. No.', tableLeft + 5, tableTop + 5)
         .text('Concentration of Gas', tableLeft + colWidths[0] + 5, tableTop + 5)
-        .text('Monitor Before Calibration', tableLeft + colWidths[0] + colWidths[1] + 5, tableTop + 5)
-        .text('Monitor After Calibration', tableLeft + colWidths[0] + colWidths[1] + colWidths[2] + 5, tableTop + 5);
+        .text('Reading Before Calibration', tableLeft + colWidths[0] + colWidths[1] + 5, tableTop + 5)
+        .text('Reading After Calibration', tableLeft + colWidths[0] + colWidths[1] + colWidths[2] + 5, tableTop + 5);
 
     doc.fillColor('#000'); // Reset fill color
 
@@ -145,14 +168,15 @@ const generatePDF = async (
         .text(
             'The above-mentioned Gas Detector was calibrated successfully, and the result confirms that the performance of the instrument is within acceptable limits.',
             50, // X position (left margin)
-            footerY - 20, // Y position above the footer
+            footerY - 50, // Y position above the footer
             { width: 490, align: 'center' } // Width and alignment
         )
         .moveDown(2);
 
     // Signature Section
-    doc.fontSize(12)
-        .text('Authorized Signatory', doc.page.width - margin - 120, doc.y)
+    doc.fontSize(14)
+        .text('Tested & Calibrated By', doc.page.width - margin - 140, doc.y)
+        .text(engineerName, doc.page.width - margin - 120, doc.y + 20)
         .moveDown(4);
 
     // Footer

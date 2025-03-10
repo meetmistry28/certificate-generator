@@ -20,7 +20,8 @@ interface CertificateRequest {
   gasCanisterDetails: String,
   dateOfCalibration: Date,
   calibrationDueDate: Date,
-  observations: Observation[]
+  observations: Observation[],
+  engineerName: String
 }
 
 interface CertificateResponse {
@@ -41,7 +42,8 @@ export default function GenerateCertificate() {
     gasCanisterDetails: "",
     dateOfCalibration: new Date().toISOString().split('T')[0],
     calibrationDueDate: new Date().toISOString().split('T')[0],
-    observations: [{ gas: "", before: "", after: "" }]
+    observations: [{ gas: "", before: "", after: "" }],
+    engineerName: ""
   });
   const [certificate, setCertificate] = useState<CertificateResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -71,7 +73,7 @@ export default function GenerateCertificate() {
           updatedObservations = Array(4).fill({ gas: "", before: "", after: "" });
           break;
         case "IR700":
-          updatedObservations = Array(1).fill({ gas: "", before: "", after: "" });
+          updatedObservations = Array(2).fill({ gas: "", before: "", after: "" });
           break;
         case "Leak":
           updatedObservations = Array(3).fill({ gas: "", before: "", after: "" });
@@ -98,10 +100,18 @@ export default function GenerateCertificate() {
   };
 
   const addObservation = () => {
-    setFormData({
-      ...formData,
-      observations: [...formData.observations, { gas: "", before: "", after: "" }]
-    });
+    if (formData.observations.length < 5) {
+      setFormData({
+        ...formData,
+        observations: [...formData.observations, { gas: "", before: "", after: "" }]
+      });
+    }
+  };
+
+  const removeObservation = (index: number) => {
+    const updatedObservations = [...formData.observations];
+    updatedObservations.splice(index, 1);
+    setFormData({ ...formData, observations: updatedObservations });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -245,55 +255,94 @@ export default function GenerateCertificate() {
           className="p-2 border rounded"
 
         />
+        <select
+          name="engineerName"
+          value={formData.engineerName}
+          onChange={handleChange}
+          className="p-2 border rounded"
+        >
+          <option value="">Select Engineer Name</option>
+          <option value="MR. Pintu Rathod">MR. Pintu Rathod</option>
+          <option value="MR. Vivek">MR. Vivek</option>
+        </select>
 
         <h2 className="text-lg font-bold mt-4">Observation Table</h2>
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={addObservation}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            disabled={formData.observations.length >= 5}
+          >
+            Add Observation
+          </button>
+        </div>
         <table className="table-auto border-collapse border border-gray-500 w-full">
           <thead>
             <tr>
+              <th className="border p-2">#</th>
               <th className="border p-2">Gas</th>
               <th className="border p-2">Before Calibration</th>
               <th className="border p-2">After Calibration</th>
+              <th className="border p-2">Remove</th>
             </tr>
           </thead>
           <tbody>
-            {formData.observations.map((obs, index) => (
+            {formData.observations.map((observation, index) => (
               <tr key={index}>
+                <td className="border p-2">{index + 1}</td>
                 <td className="border p-2">
                   <input
                     type="text"
-                    value={obs.gas}
-                    onChange={(e) => handleObservationChange(index, "gas", e.target.value)}
-                    className="w-full p-1"
+                    name="gas"
+                    value={observation.gas}
+                    onChange={(e) => handleObservationChange(index, 'gas', e.target.value)}
+                    className="w-full p-1 border rounded"
                   />
                 </td>
                 <td className="border p-2">
                   <input
                     type="text"
-                    value={obs.before}
-                    onChange={(e) => handleObservationChange(index, "before", e.target.value)}
-                    className="w-full p-1"
+                    name="before"
+                    value={observation.before}
+                    onChange={(e) => handleObservationChange(index, 'before', e.target.value)}
+                    className="w-full p-1 border rounded"
                   />
                 </td>
                 <td className="border p-2">
                   <input
                     type="text"
-                    value={obs.after}
-                    onChange={(e) => handleObservationChange(index, "after", e.target.value)}
-                    className="w-full p-1"
+                    name="after"
+                    value={observation.after}
+                    onChange={(e) => handleObservationChange(index, 'after', e.target.value)}
+                    className="w-full p-1 border rounded"
                   />
+                </td>
+                <td className="border p-2">
+                  <button
+                    onClick={() => removeObservation(index)}
+                    className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                  >
+                    Remove
+                  </button>
                 </td>
               </tr>
             ))}
+            {formData.observations.length === 0 && (
+              <tr>
+                <td colSpan={5} className="border p-2 text-center text-gray-500">
+                  No observations added yet. Click "Add Observation" to add one.
+                </td>
+              </tr>
+            )}
+            {formData.observations.length >= 5 && (
+              <tr>
+                <td colSpan={5} className="border p-2 text-center text-yellow-600">
+                  Maximum limit of 5 observations reached.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
-
-        <button
-          type="button"
-          onClick={addObservation}
-          className="bg-gray-500 text-white p-2 rounded-md"
-        >
-          Add Observation
-        </button>
 
         <button
           type="submit"

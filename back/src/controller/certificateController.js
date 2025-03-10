@@ -17,13 +17,14 @@ exports.createCertificate = async (req, res) => {
             gasCanisterDetails,
             dateOfCalibration,
             calibrationDueDate,
-            observations // Now capturing observations
+            observations, // Now capturing observations
+            engineerName
         } = req.body;
 
         // Validate required fields
         if (!certificateNo || !customerName || !siteLocation || !makeModel || !range || !serialNo || 
             !calibrationGas || !gasCanisterDetails || !dateOfCalibration || 
-            !calibrationDueDate || !observations || observations.length === 0) {
+            !calibrationDueDate || !observations || observations.length === 0 || !engineerName) {
             console.error("Missing required fields");
             return res.status(400).json({ error: "All fields and at least one observation are required" });
         }
@@ -39,7 +40,8 @@ exports.createCertificate = async (req, res) => {
             gasCanisterDetails,
             dateOfCalibration: new Date(dateOfCalibration),
             calibrationDueDate: new Date(calibrationDueDate),
-            observations // Storing the observations in the database
+            observations, // Storing the observations in the database
+            engineerName
         });
 
         console.log("Saving certificate to database...");
@@ -59,7 +61,8 @@ exports.createCertificate = async (req, res) => {
             dateOfCalibration,
             calibrationDueDate,
             newCertificate.certificateId,
-            observations // Now passing observations to the PDF generator
+            observations,
+            engineerName
         );
         console.log("PDF generated successfully at:", pdfPath);
 

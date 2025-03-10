@@ -23,7 +23,8 @@ const certificateSchema = new mongoose.Schema({
     gasCanisterDetails: { type: String, required: true },
     dateOfCalibration: { type: Date, required: true },
     calibrationDueDate: { type: Date, required: true },
-    observations: { type: [observationSchema], required: true } // Now storing multiple observations
+    observations: { type: [observationSchema], required: true }, // Now storing multiple observations
+    engineerName: { type: String, required: true }
 }, {
     timestamps: true
 });
