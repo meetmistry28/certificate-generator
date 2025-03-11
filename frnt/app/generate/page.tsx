@@ -1,4 +1,4 @@
-"use client"; // Required for useState & useEffect in App Router
+"use client"; 
 
 import { useState } from "react";
 import axios from "axios";

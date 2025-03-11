@@ -10,15 +10,19 @@ const routes = require("./routes/api/v1/index");
 
 const app = express();
 
-// Ensure certificates directory exists
-const certificatesDir = path.join(process.cwd(), "certificates");
-if (!fs.existsSync(certificatesDir)) {
-    fs.mkdirSync(certificatesDir);
-    console.log("Created certificates directory");
+// Ensure services directory exists
+const servicesDir = path.join(process.cwd(), "services");
+if (!fs.existsSync(servicesDir)) {
+    fs.mkdirSync(servicesDir);
+    console.log("Created services directory");
 }
 
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
-app.use(bodyParser.json());
+// Configure CORS to accept requests from any origin during development
+app.use(cors());
+
+// Increase JSON payload limit for large requests
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 connectDB();
 
