@@ -75,7 +75,7 @@ export default function ServiceCertificate() {
   };
 
   const addengineerRemarks = () => {
-    if (formData.engineerRemarks.length < 5) {
+    if (formData.engineerRemarks.length < 10) {
       setFormData({
         ...formData,
         engineerRemarks: [...formData.engineerRemarks, { serviceSpares: "", partNo: "", rate: "", quantity: "", poNo: "" }]
@@ -332,8 +332,7 @@ export default function ServiceCertificate() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <input
-            type="text"
+          <textarea
             name="makeModelNumberoftheInstrumentQuantity"
             placeholder="Make & Model Number of the Instrument Quantity"
             value={formData.makeModelNumberoftheInstrumentQuantity}
@@ -341,8 +340,7 @@ export default function ServiceCertificate() {
             className="p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
-          <input
-            type="text"
+          <textarea
             name="serialNumberoftheInstrumentCalibratedOK"
             placeholder="Serial Number of the Instrument Calibrated & OK"
             value={formData.serialNumberoftheInstrumentCalibratedOK}
@@ -350,8 +348,7 @@ export default function ServiceCertificate() {
             className="p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
-          <input
-            type="text"
+          <textarea
             name="serialNumberoftheFaultyNonWorkingInstruments"
             placeholder="Serial Number of Faulty/Non-Working Instruments"
             value={formData.serialNumberoftheFaultyNonWorkingInstruments}
@@ -410,7 +407,7 @@ export default function ServiceCertificate() {
               )}
             </div>
           ))}
-          {formData.engineerRemarks.length < 5 && (
+          {formData.engineerRemarks.length < 10 && (
             <button
               type="button"
               onClick={addengineerRemarks}

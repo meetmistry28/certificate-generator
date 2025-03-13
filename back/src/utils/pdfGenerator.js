@@ -34,33 +34,32 @@ const generatePDF = async (
     // Background color
     doc.rect(0, 0, doc.page.width, doc.page.height).fill('#fff');
 
-    const pageHeight = doc.page.height; // Get total page height
-    const footerY = pageHeight - 120; // Position above the "Authorized Signatory"
+    const pageHeight = doc.page.height; 
+    const footerY = pageHeight - 120; 
 
     // Border
-    // const margin = 30;
     const margin = 50;
     doc.rect(margin, margin, doc.page.width - 2 * margin, doc.page.height - 2 * margin)
         .lineWidth(2)
         .stroke('#000');
 
     // Logo
-    const logoPath = path.join(process.cwd(), 'src', 'assets', 'thumbnail.png');
+    const logoPath = path.join(process.cwd(), 'src', 'assets', 'rps.png');
     if (fs.existsSync(logoPath)) {
-        doc.image(logoPath, margin + 10, margin + 10, { width: 160, height: 80 });
+        doc.image(logoPath, margin + 0, margin + 10, { width: 250, height: 80 });
     }
 
 
     // Certificate Title
 
-    const column1X = margin + 10;  // Left column start position
-    const column2X = 250;  // Right column start position
-    const startY = 180;  // Starting Y position
-    const lineHeight = 20;  // Space between lines
-    let y = startY; // Initialize Y position
+    const column1X = margin + 10;  
+    const column2X = 250;  
+    const startY = 180;  
+    const lineHeight = 20;  
+    let y = startY; 
 
     const addRow = (label, value, extraSpace = false) => {
-        if (extraSpace) y += 0;  // Add extra space before
+        if (extraSpace) y += 0; 
         
         doc.font('Helvetica-Bold')
             .fontSize(12)
@@ -70,12 +69,12 @@ const generatePDF = async (
         doc.font('Helvetica')
             .text(value, column2X, y);
 
-        y += lineHeight;  // Move Y position down
-        if (extraSpace) y += 20;  // Add extra space after
+        y += lineHeight;  
+        if (extraSpace) y += 20;  
     };
 
     const addRow1 = (label, value, extraSpace = false) => {
-        if (extraSpace) y += 0;  // Add extra space before
+        if (extraSpace) y += 0;  
         
         doc.font('Helvetica-Bold')
             .fontSize(12)
@@ -85,8 +84,8 @@ const generatePDF = async (
         doc.font('Helvetica')
             .text(value, column2X, y);
 
-        y += lineHeight;  // Move Y position down
-        if (extraSpace) y += 40;  // Add extra space after
+        y += lineHeight;  
+        if (extraSpace) y += 40;  
     };
 
     doc.moveDown(3);
@@ -118,15 +117,15 @@ const generatePDF = async (
     // Table headers
     const tableTop = doc.y;
     const tableLeft = margin + 10;
-    const colWidths = [40, 150, 150, 140]; // Adjusted column widths
+    const colWidths = [40, 150, 150, 140]; 
     const rowHeight = 20;
 
     // Draw header borders
     doc.fillColor('#000')
-        .rect(tableLeft, tableTop, colWidths[0], rowHeight).stroke() // Sr. No.
-        .rect(tableLeft + colWidths[0], tableTop, colWidths[1], rowHeight).stroke() // Concentration of Gas,\
-        .rect(tableLeft + colWidths[0] + colWidths[1], tableTop, colWidths[2], rowHeight).stroke() // Reading Before Calibration
-        .rect(tableLeft + colWidths[0] + colWidths[1] + colWidths[2], tableTop, colWidths[3], rowHeight).stroke() // Reading After Calibration
+        .rect(tableLeft, tableTop, colWidths[0], rowHeight).stroke() 
+        .rect(tableLeft + colWidths[0], tableTop, colWidths[1], rowHeight).stroke() 
+        .rect(tableLeft + colWidths[0] + colWidths[1], tableTop, colWidths[2], rowHeight).stroke() 
+        .rect(tableLeft + colWidths[0] + colWidths[1] + colWidths[2], tableTop, colWidths[3], rowHeight).stroke() 
 
 
 
@@ -138,9 +137,9 @@ const generatePDF = async (
         .text('Reading Before Calibration', tableLeft + colWidths[0] + colWidths[1] + 5, tableTop + 5)
         .text('Reading After Calibration', tableLeft + colWidths[0] + colWidths[1] + colWidths[2] + 5, tableTop + 5);
 
-    doc.fillColor('#000'); // Reset fill color
+    doc.fillColor('#000'); 
 
-    doc.lineWidth(2).strokeColor('#000'); // Set thick dark border
+    doc.lineWidth(2).strokeColor('#000'); 
 
     // Table rows with borders
     observations.forEach((obs, index) => {
@@ -167,9 +166,9 @@ const generatePDF = async (
         .font('Helvetica')
         .text(
             'The above-mentioned Gas Detector was calibrated successfully, and the result confirms that the performance of the instrument is within acceptable limits.',
-            50, // X position (left margin)
-            footerY - 50, // Y position above the footer
-            { width: 490, align: 'center' } // Width and alignment
+            50, 
+            footerY - 50, 
+            { width: 490, align: 'center' }
         )
         .moveDown(2);
 

@@ -4,7 +4,7 @@ import ServiceCertificate from "./service/page";
 export default function Home() {
   return (
     <>
-      {/* <GenerateCertificate /> */}
+      <GenerateCertificate />
       <ServiceCertificate />
     </>
   );
