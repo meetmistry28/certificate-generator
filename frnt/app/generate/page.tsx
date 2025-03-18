@@ -32,7 +32,6 @@ interface CertificateResponse {
 
 export default function GenerateCertificate() {
   const [formData, setFormData] = useState<CertificateRequest>({
-    certificateNo: "",
     customerName: "",
     siteLocation: "",
     makeModel: "",
@@ -158,15 +157,6 @@ export default function GenerateCertificate() {
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <h1 className="text-2xl font-bold mb-4">Generate Your Certificate</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input
-          type="text"
-          name="certificateNo"
-          placeholder="Enter Certificate No"
-          value={formData.certificateNo}
-          onChange={handleChange}
-          className="p-2 border rounded"
-
-        />
         <input
           type="text"
           name="customerName"

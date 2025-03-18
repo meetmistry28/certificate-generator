@@ -38,15 +38,12 @@ const generatePDF = async (
     const footerY = pageHeight - 120; 
 
     // Border
-    const margin = 50;
-    doc.rect(margin, margin, doc.page.width - 2 * margin, doc.page.height - 2 * margin)
-        .lineWidth(2)
-        .stroke('#000');
+    const margin = 10;
 
     // Logo
     const logoPath = path.join(process.cwd(), 'src', 'assets', 'rps.png');
     if (fs.existsSync(logoPath)) {
-        doc.image(logoPath, margin + 0, margin + 10, { width: 250, height: 80 });
+        doc.image(logoPath, margin + 0, margin + 0, { width: 170, height: 50 });
     }
 
 
@@ -89,7 +86,7 @@ const generatePDF = async (
     };
 
     doc.moveDown(3);
-    doc.y = 150;
+    doc.y = 100;
     doc.fontSize(16)
         .fillColor('#1a237e')
         .text('CALIBRATION CERTIFICATE', { align: 'center', underline: true })
@@ -174,14 +171,14 @@ const generatePDF = async (
 
     // Signature Section
     doc.fontSize(14)
-        .text('Tested & Calibrated By', doc.page.width - margin - 140, doc.y)
-        .text(engineerName, doc.page.width - margin - 120, doc.y + 20)
+        .text('Tested & Calibrated By', doc.page.width - margin - 180, doc.y)
+        .text(engineerName, doc.page.width - margin - 180, doc.y + 10)
         .moveDown(4);
 
     // Footer
     doc.fontSize(8)
-        .text(`Certificate ID: ${certificateId}`, margin + 10, doc.page.height - margin - 40)
-        .text(`Generated on: ${new Date().toLocaleString()}`, margin + 10, doc.page.height - margin - 25);
+        // .text(`Certificate ID: ${certificateId}`, margin + 10, doc.page.height - margin - 80)
+        .text(`Generated on: ${new Date().toLocaleString()}`, margin + 10, doc.page.height - margin - 65);
 
     doc.end();
     return fileName;

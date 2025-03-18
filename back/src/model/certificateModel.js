@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { generateCertificateNumber } = require("../utils/certificateNumberGenerator");
 
 const observationSchema = new mongoose.Schema({
     gas: { type: String, required: true },
@@ -13,7 +14,12 @@ const certificateSchema = new mongoose.Schema({
         default: () => `CERT-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         index: true
     },
-    certificateNo: { type: String, required: true },
+    certificateNo: { 
+        type: String, 
+        unique: true,
+        required: true,
+        default: generateCertificateNumber
+    },
     customerName: { type: String, required: true },
     siteLocation: { type: String, required: true },
     makeModel: { type: String, required: true },
@@ -23,7 +29,7 @@ const certificateSchema = new mongoose.Schema({
     gasCanisterDetails: { type: String, required: true },
     dateOfCalibration: { type: Date, required: true },
     calibrationDueDate: { type: Date, required: true },
-    observations: { type: [observationSchema], required: true }, // Now storing multiple observations
+    observations: { type: [observationSchema], required: true }, 
     engineerName: { type: String, required: true }
 }, {
     timestamps: true

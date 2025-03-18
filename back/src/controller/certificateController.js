@@ -7,7 +7,6 @@ exports.createCertificate = async (req, res) => {
     try {
         console.log("Received request body:", req.body);
         const {
-            certificateNo,
             customerName,
             siteLocation,
             makeModel,
@@ -17,12 +16,12 @@ exports.createCertificate = async (req, res) => {
             gasCanisterDetails,
             dateOfCalibration,
             calibrationDueDate,
-            observations, // Now capturing observations
+            observations,
             engineerName
         } = req.body;
 
         // Validate required fields
-        if (!certificateNo || !customerName || !siteLocation || !makeModel || !range || !serialNo || 
+        if (!customerName || !siteLocation || !makeModel || !range || !serialNo || 
             !calibrationGas || !gasCanisterDetails || !dateOfCalibration || 
             !calibrationDueDate || !observations || observations.length === 0 || !engineerName) {
             console.error("Missing required fields");
@@ -30,7 +29,6 @@ exports.createCertificate = async (req, res) => {
         }
 
         const newCertificate = new Certificate({
-            certificateNo,
             customerName,
             siteLocation,
             makeModel,
@@ -40,7 +38,7 @@ exports.createCertificate = async (req, res) => {
             gasCanisterDetails,
             dateOfCalibration: new Date(dateOfCalibration),
             calibrationDueDate: new Date(calibrationDueDate),
-            observations, // Storing the observations in the database
+            observations,
             engineerName
         });
 
@@ -50,7 +48,7 @@ exports.createCertificate = async (req, res) => {
 
         console.log("Generating PDF...");
         const pdfPath = await generatePDF(
-            certificateNo,
+            newCertificate.certificateNo,
             customerName,
             siteLocation,
             makeModel,
