@@ -43,7 +43,7 @@ const generatePDF = async (
     // Logo
     const logoPath = path.join(process.cwd(), 'src', 'assets', 'rps.png');
     if (fs.existsSync(logoPath)) {
-        doc.image(logoPath, margin + 0, margin + 0, { width: 170, height: 50 });
+        doc.image(logoPath, margin + 0, margin + 0, { width: 175, height: 50 });
     }
 
 
@@ -92,7 +92,6 @@ const generatePDF = async (
         .text('CALIBRATION CERTIFICATE', { align: 'center', underline: true })
         .moveDown(2);
 
-
     // Add Certificate Fields in Two Columns
     addRow('Certificate No.', ":" + " " + certificateNo);
     addRow('Customer Name', ":" + " " + customerName);
@@ -122,7 +121,7 @@ const generatePDF = async (
         .rect(tableLeft, tableTop, colWidths[0], rowHeight).stroke() 
         .rect(tableLeft + colWidths[0], tableTop, colWidths[1], rowHeight).stroke() 
         .rect(tableLeft + colWidths[0] + colWidths[1], tableTop, colWidths[2], rowHeight).stroke() 
-        .rect(tableLeft + colWidths[0] + colWidths[1] + colWidths[2], tableTop, colWidths[3], rowHeight).stroke() 
+        .rect(tableLeft + colWidths[0] + colWidths[1] + colWidths[2], tableTop, colWidths[3], rowHeight).stroke()
 
 
 

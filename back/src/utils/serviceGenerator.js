@@ -41,9 +41,6 @@ const generatePDFService = async (
 
     // Border
     const margin = 35;
-    doc.rect(margin, margin, doc.page.width - 2 * margin, doc.page.height - 2 * margin)
-        .lineWidth(2)
-        .stroke('#000');
 
     // Logo
     const logoPath = path.join(process.cwd(), 'src', 'assets', 'rps.png');
